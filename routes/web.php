@@ -13,13 +13,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', 'orderController@index');
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/home', 'orderController@index')->name('orders');
 
 Route::delete('orders/delete/{id}', 'orderController@deleteOrder');
 Route::resource('orders', 'orderController');

@@ -56,7 +56,8 @@ class OrderController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    { // validate
+    { 
+        // validate
         // read more on validation at http://laravel.com/docs/validation
         $rules = array(
             'name'       => 'required',
@@ -65,7 +66,7 @@ class OrderController extends Controller
         );
         $validator = Validator::make($request->all(), $rules);
 
-        // process the login
+        // process validation
         if ($validator->fails()) {
             return Redirect::to('orders/create')
                 ->withErrors($validator);
@@ -83,11 +84,11 @@ class OrderController extends Controller
 
 
             //Send Email
-            // $user = \Auth::user();
-            // Mail::send('emails.reminder', ['user' => $user ], function ($m) use ($user) {
-            //     $m->from('hello@app.com', 'Order');
-            //     $m->to(\Auth::user()->email, \Auth::user()->name)->subject('New Order Created!');
-            // });
+            $user = \Auth::user();
+            Mail::send('emails.reminder', ['user' => $user ], function ($m) use ($user) {
+                $m->from('hello@app.com', 'Order');
+                $m->to(\Auth::user()->email, \Auth::user()->name)->subject('New Order Created!');
+            });
 
             // redirect
             Session::flash('message', 'Successfully created order!');
@@ -104,7 +105,9 @@ class OrderController extends Controller
     public function show($id)
     {
           // get the order
-          $order = Order::find($id);
+          $order = Order::where([
+            "created_by" => \Auth::user()->id
+          ])->find($id);
           // show the view and pass the shark to it
           return View::make('orders.show')->with('order', $order);
     }
@@ -134,7 +137,7 @@ class OrderController extends Controller
      */
     public function update(Request $request, $id)
     {
-          // validate
+         // validate
         // read more on validation at http://laravel.com/docs/validation
         $rules = array(
             'name'       => 'required',
@@ -143,13 +146,15 @@ class OrderController extends Controller
         );
         $validator = Validator::make($request->all(), $rules);
 
-        // process the login
+        // process the validation
         if ($validator->fails()) {
             return Redirect::to('orders/' . $id . '/edit')
                 ->withErrors($validator);
         } else {
             // store
-            $order = Order::find($id);
+            $order = Order::where([
+                "created_by" => \Auth::user()->id
+              ])->find($id);
             $order->name       = $request->get('name');
             $order->description      = $request->get('description');
             $order->amount = $request->get('amount');
@@ -183,7 +188,9 @@ class OrderController extends Controller
      */
     public function deleteOrder($id)
     {
-        $order = Order::findOrFail($id);
+        $order = Order::where([
+            "created_by" => \Auth::user()->id
+        ])->findOrFail($id);
         if($order){
             $order->delete(); 
         }

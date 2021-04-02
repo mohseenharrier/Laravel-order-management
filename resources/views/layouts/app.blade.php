@@ -85,7 +85,7 @@
 <script type="text/javascript">
 $(document).on('click', '.button-delete', function (e) {
     e.preventDefault();
-    var id = $(this).data('id');
+        var id = $(this).data('id');
         swal({
             title: "Are you sure!",
             type: "error",
@@ -101,13 +101,15 @@ $(document).on('click', '.button-delete', function (e) {
                             "_token": "{{ csrf_token() }}",
                         },
                         success:function(data) {
+                            $('#order_'+id).remove();
+                            $(this).closest("tr").remove();
                             if(data.status_code){
                                 swal({
-                                    title: "Alert!",
+                                    title: "Message!",
                                     type: "success",
                                     text: data.message
                                 })
-                                $('#order_'+id).remove();
+                           
                             }else{
                                 swal({
                                     title: "Alert!",
